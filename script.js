@@ -23,8 +23,11 @@ function formatTweets(tweets) {
       const content = tweet
         .querySelector("[lang]")
         .innerText.replace(/\n/g, " ");
-      const timestamp = tweet.querySelector("time").getAttribute("datetime");
-      return `[${timestamp}] ${author}: ${content}`;
+      const tweetId = tweet.getAttribute("data-tweet-id");
+      const account = tweet.querySelector('[href^="/"]').getAttribute("href");
+      const tweetUrl = `https://twitter.com${account}/status/${tweetId}`;
+
+      return `[${author} ${tweetUrl}]: ${content}`;
     })
     .join("\n");
 }
