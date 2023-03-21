@@ -35,11 +35,7 @@
   }
 
   function formatContentWithBlockquote(text) {
-    const content = text
-      .split("\n")
-      .map((line) => `> ${line}`)
-      .join("\n");
-
+    const content = text.trim().split("\n").join("\n> ");
     return content;
   }
 
