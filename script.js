@@ -23,7 +23,11 @@ function formatTweets(tweets) {
       const content = tweet
         .querySelector("[lang]")
         .innerText.replace(/\n/g, " ");
-      const tweetId = tweet.getAttribute("data-testid").split("-").pop();
+
+      // tweetIdをアカウント名のリンクから抽出
+      const permalink = tweet.querySelector('[href*="/status/"]');
+      const tweetId = permalink.href.split("/status/")[1].split("?")[0];
+
       const tweetUrl = `https://twitter.com${account}/status/${tweetId}`;
 
       return `[${account} ${tweetUrl}]: ${content}`;
