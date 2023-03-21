@@ -9,14 +9,13 @@
 // ==/UserScript==
 
 (function () {
-  "use strict";
+  ("use strict");
 
   const ACCOUNT_SELECTOR = '[href^="/"]';
   const CONTENT_SELECTOR = "[lang]";
   const TWEET_LINK_SELECTOR = '[href*="/status/"]';
   const IMAGE_SELECTOR = ".css-9pa8cd";
-  const LINK_CARD_SELECTOR = ".css-4rbku5";
-  const LINK_TITLE_SELECTOR = ".css-901oao";
+  const LINK_CARD_SELECTOR = '[data-testid="card.layoutSmall.detail"]';
 
   function extractAndFormatImages(tweet) {
     const imageElements = Array.from(
@@ -31,11 +30,7 @@
 
   function extractLinkTitle(tweet) {
     const linkElement = tweet.querySelector(LINK_CARD_SELECTOR);
-    const linkTitleElement = linkElement
-      ? linkElement.querySelector(LINK_TITLE_SELECTOR)
-      : null;
-    const linkTitle = linkTitleElement ? linkTitleElement.innerText : "";
-
+    const linkTitle = linkElement ? linkElement.innerText : "";
     return linkTitle;
   }
 
