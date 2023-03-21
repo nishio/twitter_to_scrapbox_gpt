@@ -46,9 +46,10 @@
           .querySelector(ACCOUNT_SELECTOR)
           .getAttribute("href")
           .substring(1);
-        const content = formatContentWithBlockquote(
-          tweet.querySelector(CONTENT_SELECTOR).innerText
-        );
+        const contentElement = tweet.querySelector(CONTENT_SELECTOR);
+        const content = contentElement
+          ? formatContentWithBlockquote(contentElement.innerText)
+          : "";
 
         const permalink = tweet.querySelector(TWEET_LINK_SELECTOR);
         const tweetId = permalink.href.split("/status/")[1].split("?")[0];
