@@ -35,7 +35,14 @@ function formatTweets(tweets) {
 
       const tweetUrl = `https://twitter.com/${account}/status/${tweetId}`;
 
-      return `>[${account} ${tweetUrl}]\n${content}\n`;
+      // 画像URLを取得
+      const imageUrls = Array.from(tweet.querySelectorAll(".css-9pa8cd"))
+        .map((img) => img.getAttribute("src"))
+        .join(" ");
+
+      return `>[${account} ${tweetUrl}]\n${content}${
+        imageUrls ? "\n" + imageUrls : ""
+      }\n`;
     })
     .join("\n");
 }
