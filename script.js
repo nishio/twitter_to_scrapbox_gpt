@@ -22,14 +22,19 @@ function extractAndFormatMedia(tweet) {
     1
   );
   const imageUrls = imageElements
-    .map((img) => {
-      const src = img.getAttribute("src");
-      const ext = src.split(".").pop().split("?")[0];
-      return `[${src}#.${ext}]`;
-    })
+    .map((img) => `[${img.getAttribute("src")}#.png]`)
     .join(" ");
 
-  return imageUrls;
+  // OGP画像やリンク先のタイトルを取得
+  const linkElement = tweet.querySelector(".css-4rbku5");
+  const linkTitle = linkElement
+    ? linkElement.querySelector(".css-901oao").innerText
+    : "";
+
+  return {
+    imageUrls,
+    linkTitle,
+  };
 }
 
 // ツイートから必要な情報を取得し、Scrapbox形式に整形する関数
@@ -53,11 +58,11 @@ function formatTweets(tweets) {
       const tweetUrl = `https://twitter.com/${account}/status/${tweetId}`;
 
       // 画像とリンクを抜き出し、フォーマット
-      const media = extractAndFormatMedia(tweet);
+      const { imageUrls, linkTitle } = extractAndFormatMedia(tweet);
 
       return `>[${account} ${tweetUrl}]\n${content}${
-        media ? "\n" + media : ""
-      }\n`;
+        linkTitle ? "\n> " + linkTitle : ""
+      }${imageUrls ? "\n" + imageUrls : ""}\n`;
     })
     .join("\n");
 }
