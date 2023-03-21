@@ -19,18 +19,23 @@ function getSelectedTweets() {
 function formatTweets(tweets) {
   return tweets
     .map((tweet) => {
-      const account = tweet.querySelector('[href^="/"]').getAttribute("href");
+      const account = tweet
+        .querySelector('[href^="/"]')
+        .getAttribute("href")
+        .substring(1);
       const content = tweet
         .querySelector("[lang]")
-        .innerText.replace(/\n/g, " ");
+        .innerText.split("\n")
+        .map((line) => `> ${line}`)
+        .join("\n");
 
       // tweetIdをアカウント名のリンクから抽出
       const permalink = tweet.querySelector('[href*="/status/"]');
       const tweetId = permalink.href.split("/status/")[1].split("?")[0];
 
-      const tweetUrl = `https://twitter.com${account}/status/${tweetId}`;
+      const tweetUrl = `https://twitter.com/${account}/status/${tweetId}`;
 
-      return `[${account} ${tweetUrl}]: ${content}`;
+      return `>[${account} ${tweetUrl}]\n${content}\n`;
     })
     .join("\n");
 }
