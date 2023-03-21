@@ -77,13 +77,24 @@
   }
 
   function onButtonClick() {
-    const selectedTweets = Array.from(
-      window
-        .getSelection()
-        .getRangeAt(0)
-        .cloneContents()
-        .querySelectorAll('[data-testid="tweet"]')
-    );
+    const selection = window.getSelection();
+    let selectedTweets;
+
+    if (selection.isCollapsed) {
+      // 選択されていない場合
+      selectedTweets = Array.from(
+        document.querySelectorAll('[data-testid="tweet"]')
+      );
+    } else {
+      // 選択されている場合
+      selectedTweets = Array.from(
+        selection
+          .getRangeAt(0)
+          .cloneContents()
+          .querySelectorAll('[data-testid="tweet"]')
+      );
+    }
+
     const formattedText = formatTweets(selectedTweets);
     copyToClipboard(formattedText);
   }
