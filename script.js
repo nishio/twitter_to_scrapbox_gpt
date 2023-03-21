@@ -90,7 +90,11 @@
 
   function addButton() {
     const nav = document.querySelector("nav");
-    if (!nav) return;
+    if (!nav) {
+      // navが存在しない場合、1秒後に再試行
+      setTimeout(addButton, 1000);
+      return;
+    }
 
     const button = document.createElement("button");
     button.textContent = "Export to Scrapbox";
