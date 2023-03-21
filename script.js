@@ -34,6 +34,15 @@
     return linkTitle;
   }
 
+  function formatContentWithBlockquote(text) {
+    const content = text
+      .split("\n")
+      .map((line) => `> ${line}`)
+      .join("\n");
+
+    return content;
+  }
+
   function formatTweets(tweets) {
     return tweets
       .map((tweet) => {
@@ -41,11 +50,9 @@
           .querySelector(ACCOUNT_SELECTOR)
           .getAttribute("href")
           .substring(1);
-        const content = tweet
-          .querySelector(CONTENT_SELECTOR)
-          .innerText.split("\n")
-          .map((line) => `> ${line}`)
-          .join("\n");
+        const content = formatContentWithBlockquote(
+          tweet.querySelector(CONTENT_SELECTOR).innerText
+        );
 
         const permalink = tweet.querySelector(TWEET_LINK_SELECTOR);
         const tweetId = permalink.href.split("/status/")[1].split("?")[0];
@@ -53,11 +60,11 @@
         const tweetUrl = `https://twitter.com/${account}/status/${tweetId}`;
 
         const imageUrls = extractAndFormatImages(tweet);
-        const linkTitle = extractLinkTitle(tweet);
+        const linkTitle = formatContentWithBlockquote(extractLinkTitle(tweet));
 
         return `>[${account} ${tweetUrl}] ${content}${
           linkTitle ? "\n> " + linkTitle : ""
-        }${imageUrls ? "\n" + imageUrls : ""}\n`;
+        }${imageUrls ? "\n>" + imageUrls : ""}\n`;
       })
       .join("\n");
   }
