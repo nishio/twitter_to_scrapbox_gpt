@@ -59,9 +59,9 @@
         const imageUrls = extractAndFormatImages(tweet);
         const linkTitle = formatContentWithBlockquote(extractLinkTitle(tweet));
 
-        return `>[${account} ${tweetUrl}] ${content}${
-          linkTitle ? "\n> " + linkTitle : ""
-        }${imageUrls ? "\n>" + imageUrls : ""}\n`;
+        return `>[${account} ${tweetUrl}] ${content}${linkTitle}${
+          imageUrls ? "\n> " + imageUrls : ""
+        }\n`;
       })
       .join("\n");
   }
