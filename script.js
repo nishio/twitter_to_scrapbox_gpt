@@ -19,15 +19,14 @@ function getSelectedTweets() {
 function formatTweets(tweets) {
   return tweets
     .map((tweet) => {
-      const author = tweet.querySelector(".css-901oao").innerText;
+      const account = tweet.querySelector('[href^="/"]').getAttribute("href");
       const content = tweet
         .querySelector("[lang]")
         .innerText.replace(/\n/g, " ");
-      const tweetId = tweet.getAttribute("data-tweet-id");
-      const account = tweet.querySelector('[href^="/"]').getAttribute("href");
+      const tweetId = tweet.getAttribute("data-testid").split("-").pop();
       const tweetUrl = `https://twitter.com${account}/status/${tweetId}`;
 
-      return `[${author} ${tweetUrl}]: ${content}`;
+      return `[${account} ${tweetUrl}]: ${content}`;
     })
     .join("\n");
 }
