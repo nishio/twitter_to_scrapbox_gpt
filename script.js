@@ -15,27 +15,34 @@ function getSelectedTweets() {
   return tweets;
 }
 
-// 画像とリンクを抜き出し、フォーマットする関数
-function extractAndFormatMedia(tweet) {
-  // 画像URLを取得
-  const imageElements = Array.from(tweet.querySelectorAll(".css-9pa8cd")).slice(
-    1
-  );
+const ACCOUNT_SELECTOR = '[href^="/"]';
+const CONTENT_SELECTOR = "[lang]";
+const TWEET_LINK_SELECTOR = '[href*="/status/"]';
+const IMAGE_SELECTOR = ".css-9pa8cd";
+const LINK_CARD_SELECTOR = ".css-4rbku5";
+const LINK_TITLE_SELECTOR = ".css-901oao";
+
+// 画像を抜き出し、フォーマットする関数
+function extractAndFormatImages(tweet) {
+  const imageElements = Array.from(
+    tweet.querySelectorAll(IMAGE_SELECTOR)
+  ).slice(1);
   const imageUrls = imageElements
     .map((img) => `[${img.getAttribute("src")}#.png]`)
     .join(" ");
 
-  // OGP画像やリンク先のタイトルを取得
-  const linkElement = tweet.querySelector(".css-4rbku5");
-  const linkTitle =
-    linkElement && linkElement.querySelector(".css-901oao") !== null
-      ? linkElement.querySelector(".css-901oao").innerText
-      : "";
+  return imageUrls;
+}
 
-  return {
-    imageUrls,
-    linkTitle,
-  };
+// リンク先のタイトルを取得する関数
+function extractLinkTitle(tweet) {
+  const linkElement = tweet.querySelector(LINK_CARD_SELECTOR);
+  const linkTitleElement = linkElement
+    ? linkElement.querySelector(LINK_TITLE_SELECTOR)
+    : null;
+  const linkTitle = linkTitleElement ? linkTitleElement.innerText : "";
+
+  return linkTitle;
 }
 
 // ツイートから必要な情報を取得し、Scrapbox形式に整形する関数
@@ -43,23 +50,24 @@ function formatTweets(tweets) {
   return tweets
     .map((tweet) => {
       const account = tweet
-        .querySelector('[href^="/"]')
+        .querySelector(ACCOUNT_SELECTOR)
         .getAttribute("href")
         .substring(1);
       const content = tweet
-        .querySelector("[lang]")
+        .querySelector(CONTENT_SELECTOR)
         .innerText.split("\n")
         .map((line) => `> ${line}`)
         .join("\n");
 
       // tweetIdをアカウント名のリンクから抽出
-      const permalink = tweet.querySelector('[href*="/status/"]');
+      const permalink = tweet.querySelector(TWEET_LINK_SELECTOR);
       const tweetId = permalink.href.split("/status/")[1].split("?")[0];
 
       const tweetUrl = `https://twitter.com/${account}/status/${tweetId}`;
 
       // 画像とリンクを抜き出し、フォーマット
-      const { imageUrls, linkTitle } = extractAndFormatMedia(tweet);
+      const imageUrls = extractAndFormatImages(tweet);
+      const linkTitle = extractLinkTitle(tweet);
 
       return `>[${account} ${tweetUrl}]\n${content}${
         linkTitle ? "\n> " + linkTitle : ""
