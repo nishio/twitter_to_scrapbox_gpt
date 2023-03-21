@@ -60,7 +60,7 @@
         const imageUrls = extractAndFormatImages(tweet);
         const linkTitle = extractLinkTitle(tweet);
 
-        return `>[${account} ${tweetUrl}]\n${content}${
+        return `>[${account} ${tweetUrl}] ${content}${
           linkTitle ? "\n> " + linkTitle : ""
         }${imageUrls ? "\n" + imageUrls : ""}\n`;
       })
