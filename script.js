@@ -27,9 +27,10 @@ function extractAndFormatMedia(tweet) {
 
   // OGP画像やリンク先のタイトルを取得
   const linkElement = tweet.querySelector(".css-4rbku5");
-  const linkTitle = linkElement
-    ? linkElement.querySelector(".css-901oao").innerText
-    : "";
+  const linkTitle =
+    linkElement && linkElement.querySelector(".css-901oao")
+      ? linkElement.querySelector(".css-901oao").innerText
+      : "";
 
   return {
     imageUrls,
