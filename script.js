@@ -26,7 +26,7 @@
     const imageUrls = imageElements
       .map((img) => img.getAttribute("src"))
       .filter((src) => !src.startsWith("https://pbs.twimg.com/profile_images"))
-      .map((img) => `[${img.getAttribute("src")}#.png]`)
+      .map((src) => `[${src}#.png]`)
       .join(" ");
 
     return imageUrls;
