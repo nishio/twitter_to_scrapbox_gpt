@@ -16,17 +16,41 @@
   const ACCOUNT_SELECTOR = '[href^="/"]';
   const CONTENT_SELECTOR = "[lang]";
   const TWEET_LINK_SELECTOR = '[href*="/status/"]';
-  const IMAGE_SELECTOR = ".css-9pa8cd";
+  const IMAGE_SELECTOR = '[data-testid="tweetPhoto"] img';
   const LINK_CARD_SELECTOR = '[data-testid="card.layoutSmall.detail"]';
   const QUOTE_SELECTOR = 'div[role="link"]';
 
+  function findImages(tweet) {
+    const text = tweet.querySelector('[data-testid="tweetText"]');
+    const container1 = text.parentNode.nextElementSibling;
+    if (container1 != null) {
+      if (container1.querySelectorAll('[data-testid="tweetText"]').length > 0) {
+        // it may be retweet
+        return [];
+      }
+      const images1 = Array.from(container1.querySelectorAll(IMAGE_SELECTOR));
+      if (images1.length > 0) {
+        return images1;
+      }
+    }
+    const container2 = text.parentNode.parentNode.nextElementSibling;
+    if (container2 != null) {
+      if (container2.querySelectorAll('[data-testid="tweetText"]').length > 0) {
+        // it may be retweet
+        return [];
+      }
+      const images2 = Array.from(container2.querySelectorAll(IMAGE_SELECTOR));
+      if (images2.length > 0) {
+        return images2;
+      }
+    }
+    return [];
+  }
+
   function extractAndFormatImages(tweet) {
-    const imageElements = Array.from(
-      tweet.querySelectorAll(IMAGE_SELECTOR)
-    ).slice(1);
-    const imageUrls = imageElements
+    const images = findImages(tweet);
+    const imageUrls = images
       .map((img) => img.getAttribute("src"))
-      .filter((src) => !src.startsWith("https://pbs.twimg.com/profile_images"))
       .map((src) => `[${src}#.png]`)
       .join(" ");
 
@@ -47,7 +71,7 @@
   function getAccount(tweet) {
     const accountElement = tweet.querySelector(ACCOUNT_SELECTOR);
     if (accountElement) {
-      return accountElement.getAttribute("href").substring(1);
+      return accountElement.getAttribute("href").substring(1).split("/")[0];
     }
     const spanElements = tweet.querySelectorAll("span");
     const filteredSpanElements = Array.from(spanElements).filter((span) =>
