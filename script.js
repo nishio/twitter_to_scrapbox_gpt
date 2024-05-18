@@ -64,7 +64,10 @@
     if (!permalink) {
       return "";
     }
-    const tweetId = permalink.href.split("/status/")[1].split("?")[0];
+    const tweetId = permalink.href
+      .split("/status/")[1]
+      .split("?")[0]
+      .split("/")[0];
     return tweetId;
   }
 
