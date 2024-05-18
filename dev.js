@@ -49,10 +49,14 @@ function getAccount(tweet) {
 
 function getTweetId(tweet) {
   const permalink = tweet.querySelector(TWEET_LINK_SELECTOR);
+  console.log(permalink);
   if (!permalink) {
     return "";
   }
-  const tweetId = permalink.href.split("/status/")[1].split("?")[0];
+  const tweetId = permalink.href
+    .split("/status/")[1]
+    .split("?")[0]
+    .split("/")[0];
   return tweetId;
 }
 
@@ -60,7 +64,7 @@ function formatAccount(account, tweetId) {
   if (!tweetId) {
     return account + ":";
   }
-  const tweetUrl = `https://.com/${account}/status/${tweetId}`;
+  const tweetUrl = `https://x.com/${account}/status/${tweetId}`;
   return `[${account} ${tweetUrl}]`;
 }
 
