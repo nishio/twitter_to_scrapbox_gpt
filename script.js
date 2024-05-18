@@ -1,10 +1,11 @@
 // ==UserScript==
-// @name         Twitter to Scrapbox
+// @name         Twitter(X) to Scrapbox
 // @namespace    http://tampermonkey.net/
-// @version      0.1
+// @version      0.11
 // @description  Export selected tweets to Scrapbox format
-// @author       You
+// @author       NISHIO Hirokazu (+ GPT-4)
 // @match        https://twitter.com/*
+// @match        https://x.com/*
 // @grant        none
 // ==/UserScript==
 
