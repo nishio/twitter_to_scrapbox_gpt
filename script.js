@@ -72,7 +72,7 @@
     if (!tweetId) {
       return account + ":";
     }
-    const tweetUrl = `https://twitter.com/${account}/status/${tweetId}`;
+    const tweetUrl = `https://x.com/${account}/status/${tweetId}`;
     return `[${account} ${tweetUrl}]`;
   }
 
