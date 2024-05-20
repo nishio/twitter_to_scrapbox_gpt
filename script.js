@@ -22,6 +22,7 @@
 
   function findImages(tweet) {
     const text = tweet.querySelector('[data-testid="tweetText"]');
+    if (text == null || text.parentNode == null) return [];
     const container1 = text.parentNode.nextElementSibling;
     if (container1 != null) {
       if (container1.querySelectorAll('[data-testid="tweetText"]').length > 0) {
