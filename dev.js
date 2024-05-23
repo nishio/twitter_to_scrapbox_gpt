@@ -57,6 +57,12 @@ function formatContentWithBlockquote(text) {
 }
 
 function getAccount(tweet) {
+  const avater = tweet.querySelector('[data-testid^="UserAvatar-Container-"]')
+    ?.attributes["data-testid"];
+  if (avater) {
+    // UserAvatar-Container-xxx
+    return avater.value.split("-")[2];
+  }
   const accountElement = tweet.querySelector(ACCOUNT_SELECTOR);
   if (accountElement) {
     return accountElement.getAttribute("href").substring(1).split("/")[0];
