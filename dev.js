@@ -2,37 +2,28 @@
 
 const TWEET_SELECTOR = '[data-testid="tweet"]';
 const ACCOUNT_SELECTOR = '[href^="/"]';
-const CONTENT_SELECTOR = "[lang]";
+const CONTENT_SELECTOR = '[data-testid="tweetText"], [lang]';
 const TWEET_LINK_SELECTOR = '[href*="/status/"]';
-const IMAGE_SELECTOR = '[data-testid="tweetPhoto"] img';
+const IMAGE_SELECTOR =
+  '[data-testid="tweetPhoto"] img, a[href*="/photo/"] img[src*="pbs.twimg.com/media/"]';
 const LINK_CARD_SELECTOR = '[data-testid="card.layoutSmall.detail"]';
 const QUOTE_SELECTOR = 'div[role="link"]';
 
+function isNestedQuoteElement(element, tweet) {
+  const link = element.closest(QUOTE_SELECTOR);
+  return (
+    link != null && link !== tweet && link !== element && tweet.contains(link)
+  );
+}
+
+function queryOwn(tweet, selector) {
+  return Array.from(tweet.querySelectorAll(selector)).filter(
+    (element) => !isNestedQuoteElement(element, tweet)
+  );
+}
+
 function findImages(tweet) {
-  const text = tweet.querySelector('[data-testid="tweetText"]');
-  const container1 = text.parentNode.nextElementSibling;
-  if (container1 != null) {
-    if (container1.querySelectorAll('[data-testid="tweetText"]').length > 0) {
-      // it may be retweet
-      return [];
-    }
-    const images1 = Array.from(container1.querySelectorAll(IMAGE_SELECTOR));
-    if (images1.length > 0) {
-      return images1;
-    }
-  }
-  const container2 = text.parentNode.parentNode.nextElementSibling;
-  if (container2 != null) {
-    if (container2.querySelectorAll('[data-testid="tweetText"]').length > 0) {
-      // it may be retweet
-      return [];
-    }
-    const images2 = Array.from(container2.querySelectorAll(IMAGE_SELECTOR));
-    if (images2.length > 0) {
-      return images2;
-    }
-  }
-  return [];
+  return queryOwn(tweet, IMAGE_SELECTOR);
 }
 
 function extractAndFormatImages(tweet) {
@@ -46,7 +37,7 @@ function extractAndFormatImages(tweet) {
 }
 
 function extractLinkTitle(tweet) {
-  const linkElement = tweet.querySelector(LINK_CARD_SELECTOR);
+  const linkElement = queryOwn(tweet, LINK_CARD_SELECTOR)[0];
   const linkTitle = linkElement ? linkElement.innerText : "";
   return linkTitle;
 }
@@ -57,17 +48,19 @@ function formatContentWithBlockquote(text) {
 }
 
 function getAccount(tweet) {
-  const avater = tweet.querySelector('[data-testid^="UserAvatar-Container-"]')
+  const avater = queryOwn(tweet, '[data-testid^="UserAvatar-Container-"]')[0]
     ?.attributes["data-testid"];
   if (avater) {
     // UserAvatar-Container-xxx
     return avater.value.split("-")[2];
   }
-  const accountElement = tweet.querySelector(ACCOUNT_SELECTOR);
+  const accountElement = queryOwn(tweet, ACCOUNT_SELECTOR).find((element) =>
+    /^\/[^/]+$/.test(element.getAttribute("href") || "")
+  );
   if (accountElement) {
     return accountElement.getAttribute("href").substring(1).split("/")[0];
   }
-  const spanElements = tweet.querySelectorAll("span");
+  const spanElements = queryOwn(tweet, "span");
   const filteredSpanElements = Array.from(spanElements).filter((span) =>
     span.innerText.startsWith("@")
   );
@@ -78,7 +71,9 @@ function getAccount(tweet) {
 }
 
 function getTweetId(tweet) {
-  const permalink = tweet.querySelector(TWEET_LINK_SELECTOR);
+  const permalink = queryOwn(tweet, TWEET_LINK_SELECTOR).find((element) =>
+    /\/status\/\d+/.test(element.href)
+  );
   console.log(permalink);
   if (!permalink) {
     return "";
@@ -102,7 +97,7 @@ function formatTweet(tweet) {
   console.log(tweet);
   const account = getAccount(tweet);
   console.log("account", account);
-  const contentElement = tweet.querySelector(CONTENT_SELECTOR);
+  const contentElement = queryOwn(tweet, CONTENT_SELECTOR)[0];
   const content = contentElement
     ? formatContentWithBlockquote(contentElement.innerText)
     : "";
@@ -113,10 +108,18 @@ function formatTweet(tweet) {
   const linkTitle = formatContentWithBlockquote(extractLinkTitle(tweet));
   console.log({ content, linkTitle, imageUrls });
 
-  const quoteTweetElement = tweet.querySelector(QUOTE_SELECTOR);
+  const quoteTweetElement = queryOwn(tweet, QUOTE_SELECTOR).find((element) =>
+    element.querySelector(CONTENT_SELECTOR) && getAccount(element)
+  );
   let quoteTweet = "";
   if (quoteTweetElement) {
-    quoteTweet = "\n> " + formatTweets([quoteTweetElement]);
+    quoteTweet =
+      "\n" +
+      formatTweets([quoteTweetElement])
+        .trimEnd()
+        .split("\n")
+        .map((line) => "> " + line)
+        .join("\n");
   }
 
   return `>${formatAccount(account, tweetId)} ${content}${linkTitle}${
@@ -130,18 +133,23 @@ function formatTweets(tweets) {
 
 function getTweets() {
   const selection = window.getSelection();
-  let selectedTweets;
 
   if (selection.isCollapsed) {
     // 選択されていない場合
-    selectedTweets = Array.from(document.querySelectorAll(TWEET_SELECTOR));
-  } else {
-    // 選択されている場合
-    selectedTweets = Array.from(
-      selection.getRangeAt(0).cloneContents().querySelectorAll(TWEET_SELECTOR)
-    );
+    return Array.from(document.querySelectorAll(TWEET_SELECTOR));
   }
-  return selectedTweets;
+
+  const range = selection.getRangeAt(0);
+  const selectedTweets = Array.from(document.querySelectorAll(TWEET_SELECTOR))
+    .filter((tweet) => range.intersectsNode(tweet));
+
+  if (selectedTweets.length > 0) {
+    return selectedTweets;
+  }
+
+  return Array.from(
+    selection.getRangeAt(0).cloneContents().querySelectorAll(TWEET_SELECTOR)
+  );
 }
 
 function run() {
